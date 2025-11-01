@@ -26,6 +26,13 @@ export default function App() {
   const [compareList, setCompareList] = useState(() => {
     try { return JSON.parse(localStorage.getItem("compare") || "[]"); } catch { return []; }
   });
+  const [recent, setRecent] = useState(() => {
+  try { return JSON.parse(localStorage.getItem("recent") || "[]"); }
+  catch { return []; }
+  });
+  useEffect(() => {
+  localStorage.setItem("recent", JSON.stringify(recent));
+  }, [recent]);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -73,13 +80,12 @@ export default function App() {
     }
   }
 
-  function handleSearch(q, y, sort) {
-    setQuery(q);
-    setYearFilter(y || "");
-    setSortBy(sort || "relevance");
-    setPage(1);
-    setSelected(null);
-    searchMovies(q, 1, y);
+  function handleSearch(q, y = "", sort = "relevance") {
+  setQuery(q);
+  setYearFilter(y || "");
+  setSortBy(sort || "relevance");
+  setPage(1);
+  setRecent((r) => [q, ...r.filter((x) => x !== q)].slice(0, 8));
   }
 
   function toggleFavorite(movie) {
@@ -124,7 +130,7 @@ export default function App() {
       />
       {view === "home" && (
         <>
-          <SearchForm onSearch={handleSearch} currentSort={sortBy} />
+          <SearchForm onSearch={handleSearch} currentSort={sortBy} recent={recent} />
           <div className="meta-row">
             <div className="fav-count">Favorites: {favorites.length}</div>
             {totalResults > 0 && <div className="results-count">{totalResults} results</div>}
