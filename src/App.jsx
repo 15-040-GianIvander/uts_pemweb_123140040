@@ -18,6 +18,7 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastScroll, setLastScroll] = useState(0);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [favorites, setFavorites] = useState(() => {
@@ -26,7 +27,7 @@ export default function App() {
   const [compareList, setCompareList] = useState(() => {
     try { return JSON.parse(localStorage.getItem("compare") || "[]"); } catch { return []; }
   });
-
+  
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
@@ -60,6 +61,7 @@ export default function App() {
   }
 
   async function fetchDetail(imdbID) {
+    setLastScroll(window.scrollY || 0);
     setLoading(true);
     try {
       const key = import.meta.env.VITE_OMDB_API_KEY;
@@ -71,6 +73,13 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleBackFromDetail() {
+  setSelected(null);
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: lastScroll, behavior: 'auto' }); // atau 'smooth' kalau mau animasi
+  });
   }
 
   function handleSearch(q, y, sort) {
@@ -102,7 +111,7 @@ export default function App() {
   // Pagination effect: fetch when page changes
   useEffect(() => {
     if (query) searchMovies(query, page, yearFilter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page]);
 
   // client-side sorting (simple)
@@ -154,9 +163,10 @@ export default function App() {
           ) : (
             <DetailCard
               movie={selected}
-              onBack={() => setSelected(null)}
+              onBack={handleBackFromDetail}
               onToggleFavorite={toggleFavorite}
               favorites={favorites}
+              addToList={addToList}
             />
           )}
         </>
