@@ -30,20 +30,27 @@ Pengguna dapat melakukan pencarian film berdasarkan judul dan tahun, melihat det
 ```bash
 git clone https://github.com/15-040-GianIvander/uts_pemweb_123140040.git
 cd uts_pengweb_123140040
-
+```
 ### 2. Install Dependencies
 Pastikan Node.js sudah terinstall, lalu jalankan 
+```bash
 npm install
+```
 
 ### 3. Buat File .env
 Isi dengan API Key dari OMDB API
+```bash
 VITE_OMDB_API_KEY=d480045c
+```
 
 ### 4. Jalankan Server Development
+```bash
 npm run dev
-
+```
 ### 5. Build untuk Production
+```bash
 npm run build
+```
 
 ## 🚀 Link Deployment
 Link Preview: https://utspemweb123140040.vercel.app/
