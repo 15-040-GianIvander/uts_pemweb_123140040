@@ -6,6 +6,7 @@ import DetailCard from "./components/DetailCard";
 import Pagination from "./components/Pagination";
 import FavoritesPage from "./components/FavoritesPage";
 import ComparePage from "./components/ComparePage";
+import Recommendations from "./components/Recommendations";
 
 const API_URL = "https://www.omdbapi.com/";
 
@@ -18,7 +19,6 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [lastScroll, setLastScroll] = useState(0);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [favorites, setFavorites] = useState(() => {
@@ -27,7 +27,7 @@ export default function App() {
   const [compareList, setCompareList] = useState(() => {
     try { return JSON.parse(localStorage.getItem("compare") || "[]"); } catch { return []; }
   });
-  
+
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
@@ -61,7 +61,6 @@ export default function App() {
   }
 
   async function fetchDetail(imdbID) {
-    setLastScroll(window.scrollY || 0);
     setLoading(true);
     try {
       const key = import.meta.env.VITE_OMDB_API_KEY;
@@ -73,13 +72,6 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleBackFromDetail() {
-  setSelected(null);
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: lastScroll, behavior: 'auto' }); // atau 'smooth' kalau mau animasi
-  });
   }
 
   function handleSearch(q, y, sort) {
@@ -111,7 +103,7 @@ export default function App() {
   // Pagination effect: fetch when page changes
   useEffect(() => {
     if (query) searchMovies(query, page, yearFilter);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   // client-side sorting (simple)
@@ -142,34 +134,36 @@ export default function App() {
           {loading && <p className="info">Loading...</p>}
           {error && <p className="error">{error}</p>}
 
-          {!selected ? (
-            <>
-              <DataTable
-                data={sortedMovies(movies)}
-                onSelect={fetchDetail}
-                onToggleFavorite={toggleFavorite}
-                favorites={favorites}
-                onToggleCompare={toggleCompare}
-                compareList={compareList}
-              />
-              {totalResults > 0 && (
-                <Pagination
-                  page={page}
-                  setPage={setPage}
-                  totalResults={totalResults}
-                />
-              )}
-            </>
-          ) : (
-            <DetailCard
-              movie={selected}
-              onBack={handleBackFromDetail}
-              onToggleFavorite={toggleFavorite}
-              favorites={favorites}
-              addToList={addToList}
-            />
-          )}
-        </>
+{!selected ? (
+  <>
+    {query ? (
+      <>
+        <DataTable
+          data={sortedMovies(movies)}
+          onSelect={fetchDetail}
+          onToggleFavorite={toggleFavorite}
+          favorites={favorites}
+        />
+        {totalResults > 0 && (
+          <Pagination
+            page={page}
+            setPage={setPage}
+            totalResults={totalResults}
+          />
+        )}
+      </>
+    ) : (
+      <Recommendations onOpen={fetchDetail} />
+    )}
+  </>
+) : (
+  <DetailCard
+    movie={selected}
+    onBack={() => setSelected(null)}
+    onToggleFavorite={toggleFavorite}
+    favorites={favorites}
+  />
+)}        </>
       )}
 
       {view === "favorites" && (

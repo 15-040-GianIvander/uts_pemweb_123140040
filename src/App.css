@@ -203,3 +203,17 @@ button:active{ transform:translateY(-1px); }
 
 /* focus accessibility */
 button:focus, input:focus, select:focus { outline: 3px solid rgba(11,116,222,0.14); outline-offset:2px; }
+
+.rec-row {
+  scroll-snap-type: x mandatory;
+}
+.rec-row > .card {
+  scroll-snap-align: start;
+}
+.rec-row::-webkit-scrollbar {
+  height: 8px;
+}
+.rec-row::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
