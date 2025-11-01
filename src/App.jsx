@@ -1,3 +1,4 @@
+console.log("All env vars:", import.meta.env);
 import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import SearchForm from "./components/SearchForm";
