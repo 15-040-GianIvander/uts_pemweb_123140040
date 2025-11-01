@@ -1,16 +1,9 @@
 // vite.config.js
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [
-    {
-      name: 'rewrite-root-to-public-index',
-      configureServer(server) {
-        server.middlewares.use((req, _res, next) => {
-          if (req.url === '/' || req.url === '') req.url = '/index.html';
-          next();
-        });
-      }
-    }
-  ]
-});
+  plugins: [react()],
+  publicDir: 'public',
+  build: { outDir: 'dist' }
+})
